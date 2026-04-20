@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: phosur
+    runtime: docker
+    repo: https://github.com/harmitvagadiya123-dotcom/Phosur
+    branch: main
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: SMTP_EMAIL
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: NOTIFY_TO
+        sync: false
+      - key: NOTIFY_CC
+        sync: false
+      - key: GOOGLE_SHEET_ID
+        sync: false
+      - key: GOOGLE_SHEET_NAME
+        sync: false
+      - key: GOOGLE_CREDENTIALS_BASE64
+        sync: false
