@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  *{{margin:0;padding:0;box-sizing:border-box}}
+  body{{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8}}
+  .wrap{{max-width:640px;margin:30px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.12)}}
+
+  /* ── HEADER ── */
+  .header{{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px 36px;text-align:center}}
+  .header h1{{color:#fff;font-size:28px;font-weight:800;letter-spacing:0.5px}}
+  .header p{{color:rgba(255,255,255,0.82);font-size:14px;margin-top:8px}}
+  .badge{{display:inline-block;background:#ff4757;color:#fff;font-size:11px;font-weight:800;padding:6px 20px;border-radius:30px;margin-top:16px;letter-spacing:2px;text-transform:uppercase}}
+
+  /* ── BODY ── */
+  .body{{padding:36px}}
+  .sec-title{{font-size:10px;font-weight:800;color:#667eea;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:16px}}
+
+  /* ── GRID ── */
+  .grid{{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}}
+  .card{{background:#f7f8fc;border-radius:12px;padding:14px 16px;border-left:4px solid #667eea}}
+  .card label{{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:5px}}
+  .card span{{font-size:14px;font-weight:700;color:#2d3748;word-break:break-word}}
+
+  /* ── INTENT CARD ── */
+  .intent-card{{background:#fff5f5;border-left:4px solid #ff4757}}
+  .intent-card span{{color:#ff4757}}
+
+  /* ── CONVERSATION ── */
+  .conv{{background:#f7f8fc;border-radius:12px;padding:20px;margin-bottom:28px;border-left:4px solid #764ba2}}
+  .conv p{{font-size:14px;color:#4a5568;line-height:1.9}}
+
+  .divider{{height:1px;background:#edf2f7;margin:24px 0}}
+
+  /* ── CTA ── */
+  .cta{{text-align:center;margin:28px 0 4px}}
+  .cta a{{display:inline-block;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff !important;text-decoration:none;padding:15px 44px;border-radius:32px;font-size:15px;font-weight:800;letter-spacing:0.5px;box-shadow:0 6px 20px rgba(102,126,234,0.45)}}
+
+  /* ── FOOTER ── */
+  .footer{{background:#f7f8fc;padding:20px 36px;text-align:center;border-top:1px solid #edf2f7}}
+  .footer p{{font-size:11px;color:#b0bec5;line-height:2}}
+  .hi{{color:#667eea;font-weight:700}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>🚀 New High Intent Lead!</h1>
+    <p>A potential buyer just entered your pipeline — act fast!</p>
+    <div class="badge">🔥 Buying Intent: HIGH</div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <p class="sec-title">📋 Lead Information</p>
+    <div class="grid">
+
+      <div class="card">
+        <label>Full Name</label>
+        <span>{NAME}</span>
+      </div>
+
+      <div class="card">
+        <label>Country</label>
+        <span>🌍 {COUNTRY}</span>
+      </div>
+
+      <div class="card">
+        <label>Designation / Company</label>
+        <span>💼 {DESIGNATIONORCOMPANY}</span>
+      </div>
+
+      <div class="card">
+        <label>Date Added</label>
+        <span>📅 {DATE}</span>
+      </div>
+
+      <div class="card">
+        <label>SNO</label>
+        <span>#{SNO}</span>
+      </div>
+
+      <div class="card intent-card">
+        <label>Buying Intent</label>
+        <span>🔥 {BuyingIntent}</span>
+      </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="sec-title">💬 Conversation History</p>
+    <div class="conv">
+      <p>{ConversationHistory}</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="cta">
+      <a href="{LINKEDIN}">🔗 View LinkedIn Profile →</a>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>Powered by <span class="hi">Phosur</span> Buying Intent Agent</p>
+  </div>
+
+</div>
+</body>
+</html>

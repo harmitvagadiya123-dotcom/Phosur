@@ -1,0 +1,21 @@
+# Environment files (contain secrets)
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# n8n workflow files (not needed in deployment)
+*.json
+
+# Excel files
+*.xlsx
+
+# IDE
+.vscode/
+.idea/
