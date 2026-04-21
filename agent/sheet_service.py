@@ -48,7 +48,7 @@ def update_status(row_number: int, status: str = "Done") -> Tuple[bool, Optional
         (False, error_msg) otherwise.
     """
     sheet_id = os.environ.get(
-        "GOOGLE_SHEET_ID", "1W1wWwvc3t6Z7WOHAocI5hSQuz2bFTSDPMqgeZ0T_QHE"
+        "GOOGLE_SHEET_ID", "1erIY6nUrWBzPimCmnvZk6IAFg-mBOwykB9nW8juTDto"
     )
     sheet_name = os.environ.get("GOOGLE_SHEET_NAME", "Buying_intent_Linkedin")
 
@@ -64,6 +64,6 @@ def update_status(row_number: int, status: str = "Done") -> Tuple[bool, Optional
         return True, None
 
     except Exception as e:
-        err = f"Sheet update failed: {str(e)}"
+        err = f"Sheet update failed ({type(e).__name__}): {str(e) or repr(e)}"
         logger.error(f"❌ {err}")
         return False, err

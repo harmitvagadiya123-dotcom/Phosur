@@ -113,8 +113,9 @@ class BuyingIntentAgent:
             sheet_error = "Missing valid row_number"
             logger.warning(f"⚠️ {sheet_error} — skipping sheet update.")
 
-        # Determine overall success
-        success = email_sent and sheet_updated
+        # Determine success: For now, if email is sent, we return success (200) 
+        # so the Apps Script doesn't mark it as 'Error', even if our own sheet update fails.
+        success = email_sent
         
         errors = []
         if not email_sent: errors.append(f"Email: {email_error}")
