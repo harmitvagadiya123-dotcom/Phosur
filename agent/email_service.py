@@ -77,10 +77,8 @@ def send_lead_email(lead_data: dict) -> Tuple[bool, Optional[str]]:
         recipients.extend([cc.strip() for cc in notify_cc.split(",") if cc.strip()])
 
     try:
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
+        # Use port 465 (Implicit SSL) for maximum compatibility in cloud envs
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(smtp_email, smtp_password)
             server.sendmail(smtp_email, recipients, msg.as_string())
 
