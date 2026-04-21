@@ -100,19 +100,27 @@ class BuyingIntentAgent:
         logger.info(f"📋 Lead: {lead.NAME} | {lead.COUNTRY} | {lead.DESIGNATIONORCOMPANY}")
 
         # Step 2: Send email notification
-        email_sent = send_lead_email(payload)
+        email_sent, email_error = send_lead_email(payload)
         if not email_sent:
-            logger.warning("⚠️ Email failed but continuing to update sheet...")
+            logger.warning(f"⚠️ Email failed: {email_error}")
 
         # Step 3: Update Google Sheet status
         sheet_updated = False
+        sheet_error = None
         if lead.row_number > 0:
-            sheet_updated = update_status(lead.row_number, "Done")
+            sheet_updated, sheet_error = update_status(lead.row_number, "Done")
         else:
-            logger.warning("⚠️ No valid row_number — skipping sheet update.")
+            sheet_error = "Missing valid row_number"
+            logger.warning(f"⚠️ {sheet_error} — skipping sheet update.")
 
         # Determine overall success
         success = email_sent and sheet_updated
+        
+        errors = []
+        if not email_sent: errors.append(f"Email: {email_error}")
+        if not sheet_updated: errors.append(f"Sheet: {sheet_error}")
+        error_summary = " | ".join(errors) if errors else None
+
         if success:
             message = f"✅ Lead '{lead.NAME}' processed successfully. Email sent & sheet updated."
         elif email_sent:
@@ -129,4 +137,5 @@ class BuyingIntentAgent:
             email_sent=email_sent,
             sheet_updated=sheet_updated,
             message=message,
+            error=error_summary,
         )

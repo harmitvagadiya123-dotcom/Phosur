@@ -19,7 +19,9 @@ _TEMPLATE_PATH = Path(__file__).parent / "email_template.html"
 _EMAIL_TEMPLATE = _TEMPLATE_PATH.read_text(encoding="utf-8")
 
 
-def send_lead_email(lead_data: dict) -> bool:
+from typing import Tuple, Optional
+
+def send_lead_email(lead_data: dict) -> Tuple[bool, Optional[str]]:
     """
     Send a high-intent lead notification email.
 
@@ -28,7 +30,8 @@ def send_lead_email(lead_data: dict) -> bool:
                    DATE, SNO, BuyingIntent, ConversationHistory, LINKEDIN
 
     Returns:
-        True if email sent successfully, False otherwise.
+        (True, None) if email sent successfully.
+        (False, error_msg) otherwise.
     """
     smtp_email = os.environ.get("SMTP_EMAIL", "")
     smtp_password = os.environ.get("SMTP_PASSWORD", "")
@@ -36,8 +39,7 @@ def send_lead_email(lead_data: dict) -> bool:
     notify_cc = os.environ.get("NOTIFY_CC", "harmitvagadiya123@gmail.com")
 
     if not smtp_email or not smtp_password:
-        logger.error("SMTP_EMAIL or SMTP_PASSWORD not configured")
-        return False
+        return False, "SMTP_EMAIL or SMTP_PASSWORD not configured"
 
     # Build subject
     name = lead_data.get("NAME", "Unknown")
@@ -45,16 +47,19 @@ def send_lead_email(lead_data: dict) -> bool:
     subject = f"🔥 High Intent Lead: {name} From {country}"
 
     # Render HTML body
-    html_body = _EMAIL_TEMPLATE.format(
-        NAME=lead_data.get("NAME", ""),
-        COUNTRY=lead_data.get("COUNTRY", ""),
-        DESIGNATIONORCOMPANY=lead_data.get("DESIGNATIONORCOMPANY", ""),
-        DATE=lead_data.get("DATE", ""),
-        SNO=lead_data.get("SNO", ""),
-        BuyingIntent=lead_data.get("BuyingIntent", ""),
-        ConversationHistory=lead_data.get("ConversationHistory", ""),
-        LINKEDIN=lead_data.get("LINKEDIN", "#"),
-    )
+    try:
+        html_body = _EMAIL_TEMPLATE.format(
+            NAME=lead_data.get("NAME", ""),
+            COUNTRY=lead_data.get("COUNTRY", ""),
+            DESIGNATIONORCOMPANY=lead_data.get("DESIGNATIONORCOMPANY", ""),
+            DATE=lead_data.get("DATE", ""),
+            SNO=lead_data.get("SNO", ""),
+            BuyingIntent=lead_data.get("BuyingIntent", ""),
+            ConversationHistory=lead_data.get("ConversationHistory", ""),
+            LINKEDIN=lead_data.get("LINKEDIN", "#"),
+        )
+    except Exception as e:
+        return False, f"Template rendering failed: {e}"
 
     # Compose email
     msg = MIMEMultipart("alternative")
@@ -80,14 +85,13 @@ def send_lead_email(lead_data: dict) -> bool:
             server.sendmail(smtp_email, recipients, msg.as_string())
 
         logger.info(f"✅ Email sent for lead: {name} ({country})")
-        return True
+        return True, None
 
     except smtplib.SMTPAuthenticationError:
-        logger.error(
-            "❌ SMTP authentication failed. Check SMTP_EMAIL and SMTP_PASSWORD. "
-            "Make sure you're using a Gmail App Password, not your regular password."
-        )
-        return False
+        err = "SMTP authentication failed. Check credentials/App Password."
+        logger.error(f"❌ {err}")
+        return False, err
     except Exception as e:
-        logger.error(f"❌ Failed to send email: {e}")
-        return False
+        err = f"SMTP Exception: {str(e)}"
+        logger.error(f"❌ {err}")
+        return False, err

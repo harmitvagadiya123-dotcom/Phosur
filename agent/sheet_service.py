@@ -33,7 +33,9 @@ def _get_client() -> gspread.Client:
     return gspread.authorize(credentials)
 
 
-def update_status(row_number: int, status: str = "Done") -> bool:
+from typing import Tuple, Optional
+
+def update_status(row_number: int, status: str = "Done") -> Tuple[bool, Optional[str]]:
     """
     Update the Status_Sent column (Column I, index 9) for a given row.
 
@@ -42,7 +44,8 @@ def update_status(row_number: int, status: str = "Done") -> bool:
         status: The status value to set (default: "Done").
 
     Returns:
-        True if update succeeded, False otherwise.
+        (True, None) if update succeeded.
+        (False, error_msg) otherwise.
     """
     sheet_id = os.environ.get(
         "GOOGLE_SHEET_ID", "1W1wWwvc3t6Z7WOHAocI5hSQuz2bFTSDPMqgeZ0T_QHE"
@@ -58,8 +61,9 @@ def update_status(row_number: int, status: str = "Done") -> bool:
         worksheet.update_cell(row_number, 9, status)
 
         logger.info(f"✅ Sheet updated: Row {row_number} → Status_Sent = '{status}'")
-        return True
+        return True, None
 
     except Exception as e:
-        logger.error(f"❌ Failed to update sheet row {row_number}: {e}")
-        return False
+        err = f"Sheet update failed: {str(e)}"
+        logger.error(f"❌ {err}")
+        return False, err

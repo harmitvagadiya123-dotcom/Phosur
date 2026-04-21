@@ -53,11 +53,33 @@ app = FastAPI(
 agent = BuyingIntentAgent()
 
 
+# ── Root Endpoint ──────────────────────────────────────────
+@app.get("/")
+async def root():
+    """Service landing page for quick deployment checks."""
+    return {
+        "status": "online",
+        "service": "Buying Intent Agent",
+        "webhook_url": "/webhook/buying-intent"
+    }
+
+
 # ── Health Check ─────────────────────────────────────────
 @app.get("/health")
 async def health():
     """Health check endpoint for Render / AWS."""
-    return {"status": "healthy", "agent": "buying-intent-linkedin", "version": "1.0.0"}
+    return {"status": "healthy", "agent": "buying-intent-linkedin", "version": "1.0.1"}
+
+
+# ── Webhook Diagnostic Handler ───────────────────────────
+@app.get("/webhook/buying-intent")
+async def webhook_diagnostic():
+    """Helpful message for accidental GET requests to the webhook URL."""
+    return {
+        "error": "Method Not Allowed",
+        "message": "This endpoint requires a POST request from Google Apps Script. "
+                   "If you are seeing this in a browser, the endpoint is working correctly."
+    }
 
 
 # ── Webhook Endpoint ─────────────────────────────────────
@@ -92,6 +114,13 @@ async def webhook_buying_intent(request: Request):
 
     # Process through the agent
     result = agent.process(payload)
+
+    # Log specific failure reasons if 207 (partial success)
+    if not result.success:
+        logger.warning(f"⚠️ Partial Success (207) for '{payload.get('NAME')}':")
+        logger.warning(f"   Message : {result.message}")
+        if result.error:
+            logger.warning(f"   Error   : {result.error}")
 
     status_code = 200 if result.success else 207  # 207 = partial success
 
