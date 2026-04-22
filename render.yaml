@@ -34,7 +34,7 @@ services:
     repo: https://github.com/harmitvagadiya123-dotcom/Phosur
     branch: main
     plan: free
-    schedule: "0 9 * * *" # Runs every day at 9 AM UTC
+    schedule: "0 1 * * 0" # Runs every Sunday at 1 AM UTC
     dockerCommand: "python agent/bg001_step_1/code/run_agent.py"
     envVars:
       - key: GOOGLE_CREDENTIALS_BASE64
