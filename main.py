@@ -17,7 +17,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from agent.buying_intent_agent import BuyingIntentAgent
+from agent.buying_intent.code.buying_intent_agent import BuyingIntentAgent
 
 # ── Logging ──────────────────────────────────────────────
 logging.basicConfig(
