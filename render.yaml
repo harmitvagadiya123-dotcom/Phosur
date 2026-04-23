@@ -24,7 +24,7 @@ services:
       - key: GOOGLE_CREDENTIALS_BASE64
         sync: false
       - key: OPENROUTER_API_KEY
-        value: "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"
+        sync: false
       - key: BG001_SHEET_ID
         value: "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM"
 
