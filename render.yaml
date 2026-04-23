@@ -27,4 +27,20 @@ services:
         sync: false
       - key: BG001_SHEET_ID
         value: "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM"
+      # ── Autoresponder Support Agent ──
+      - key: AUTORESPONDER_EMAIL
+        sync: false
+      - key: AUTORESPONDER_PASSWORD
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      # ── WordPress (BG001 Step 3) ──
+      - key: WP_PUBLISH_URL
+        sync: false
+      - key: WP_SECRET
+        sync: false
+      - key: WP_AUTHOR
+        sync: false
 

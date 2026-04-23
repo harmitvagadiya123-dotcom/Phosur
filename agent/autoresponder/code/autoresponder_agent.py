@@ -27,7 +27,11 @@ import logging
 import time
 
 from .html_utils import strip_html
-from .gmail_service import fetch_unread_emails, mark_as_read, send_reply
+from .gmail_service import (
+    fetch_unread_emails, mark_as_read, send_reply, tag_email,
+    TAG_KB_REPLY, TAG_FALLBACK_REPLY, TAG_CLARIFICATION,
+    TAG_SPAM_SKIPPED, TAG_NOT_INTERESTED, TAG_PENDING,
+)
 from .spam_classifier import classify_email
 from .intent_classifier import classify_intent
 from .kb_search import search_knowledge_base
@@ -119,6 +123,7 @@ class AutoresponderAgent:
         if validity != "Valid":
             logger.info(f"⏭️  Skipping {validity} email: {subject[:60]}")
             summary["spam_skipped"] += 1
+            tag_email(imap_id, TAG_SPAM_SKIPPED)
             return
 
         # ── Step 4: Strip HTML → cleanedContent ─────────────────
@@ -148,10 +153,12 @@ class AutoresponderAgent:
         elif category == "Not Interested":
             logger.info("⏭️  Not Interested — no reply sent")
             summary["not_interested_skipped"] += 1
+            tag_email(imap_id, TAG_NOT_INTERESTED)
 
         else:  # Pending
             logger.info("⏳ Pending — no reply sent")
             summary["pending_skipped"] += 1
+            tag_email(imap_id, TAG_PENDING)
 
     # ── Route handlers ─────────────────────────────────────────────
 
@@ -178,12 +185,14 @@ class AutoresponderAgent:
             best_answer = kb_result["matched_rows"][0]["answer"]
             logger.info(f"✅ KB match found (similarity={kb_result['matched_rows'][0]['similarity']})")
             html_reply = format_kb_reply(subject, best_answer, sender_name)
+            op_tag = TAG_KB_REPLY
         else:
             # Generate engagement reply (AI Agent 3)
             logger.info("📭 No KB match — generating fallback reply (Agent 3)")
             html_reply = format_fallback_reply(subject, cleaned_content, sender_name)
+            op_tag = TAG_FALLBACK_REPLY
 
-        sent = send_reply(to_email, subject, html_reply, in_reply_to, references, imap_id=imap_id)
+        sent = send_reply(to_email, subject, html_reply, in_reply_to, references, imap_id=imap_id, op_tag=op_tag)
         if sent:
             summary["replies_sent"] += 1
         else:
@@ -210,7 +219,7 @@ class AutoresponderAgent:
 
         html_reply = format_clarification_reply(subject, cleaned_content, sender_name, kb_rows)
 
-        sent = send_reply(to_email, subject, html_reply, in_reply_to, references, imap_id=imap_id)
+        sent = send_reply(to_email, subject, html_reply, in_reply_to, references, imap_id=imap_id, op_tag=TAG_CLARIFICATION)
         if sent:
             summary["replies_sent"] += 1
         else:

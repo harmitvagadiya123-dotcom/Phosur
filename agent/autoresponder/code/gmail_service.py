@@ -32,6 +32,14 @@ BATCH_LIMIT = 10
 # Gmail label applied to every email that receives an automated reply
 AUTORESPONDER_LABEL = "Autoresponder-Replied"
 
+# ── Operation-specific labels (so you can filter by tag in Gmail) ──
+TAG_KB_REPLY        = "OP/KB-Reply"          # KB match found → Agent 2 reply
+TAG_FALLBACK_REPLY  = "OP/Fallback-Reply"    # No KB match → Agent 3 engagement reply
+TAG_CLARIFICATION   = "OP/Clarification"     # More Info Needed → Agent 4 reply
+TAG_SPAM_SKIPPED    = "OP/Spam-Skipped"      # Spam/Scam → skipped
+TAG_NOT_INTERESTED  = "OP/Not-Interested"    # Not Interested → skipped
+TAG_PENDING         = "OP/Pending"           # Ambiguous → skipped
+
 # Addresses that should be skipped (own-domain filter, replicates If2 node)
 SKIP_SENDERS = {"harmitvagadiya123@gmail.com", "pathvancer"}
 
@@ -234,11 +242,13 @@ def send_reply(
     in_reply_to: str = "",
     references: str = "",
     imap_id: bytes = None,
+    op_tag: str = "",
 ) -> bool:
     """
     Send an HTML reply email via Gmail SMTP.
     After sending, applies the 'Autoresponder-Replied' Gmail label
-    so you can identify all auto-replied emails in Gmail.
+    plus an operation-specific tag (e.g. OP/KB-Reply) so you can
+    identify all auto-replied emails and their processing path in Gmail.
     """
     try:
         from_email, password = _get_credentials()
@@ -269,12 +279,26 @@ def send_reply(
 
         logger.info(f"✅ Reply sent to {to_email} | Subject: {reply_subject}")
 
-        # ── Apply Gmail label so the email is tagged in inbox ──
+        # ── Apply Gmail labels so the email is tagged in inbox ──
         if imap_id is not None:
             add_gmail_label(imap_id, AUTORESPONDER_LABEL)
+            # Apply operation-specific tag
+            if op_tag:
+                add_gmail_label(imap_id, op_tag)
+                logger.info(f"🏷️  OP tag applied: {op_tag}")
 
         return True
 
     except Exception as e:
         logger.error(f"❌ SMTP send failed: {e}", exc_info=True)
         return False
+
+
+def tag_email(imap_id: bytes, op_tag: str) -> None:
+    """
+    Apply only an operation tag to an email (no reply sent).
+    Used for emails that are skipped (Spam, Not Interested, Pending).
+    """
+    if imap_id is not None and op_tag:
+        add_gmail_label(imap_id, op_tag)
+        logger.info(f"🏷️  Skipped-email OP tag applied: {op_tag}")
