@@ -146,7 +146,8 @@ def run_bg001_agent_task():
         agent_step1 = Step1Agent(spreadsheet_id)
         agent_step1.run()
     except Exception as e:
-        logger.error(f"💥 Fatal error during bg001 agent execution: {e}")
+        import traceback
+        logger.error(f"💥 Fatal error during bg001 agent execution: {e}\n{traceback.format_exc()}")
 
 @app.post("/webhook/run-bg001")
 async def webhook_run_bg001(background_tasks: BackgroundTasks):
