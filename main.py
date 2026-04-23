@@ -136,6 +136,27 @@ async def webhook_buying_intent(request: Request):
     )
 
 
+# ── BG001 Step 1 Endpoint ──────────────────────────────────
+from agent.bg001_step_1.code.step_1_agent import Step1Agent
+from fastapi import BackgroundTasks
+
+def run_bg001_agent_task():
+    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM")
+    try:
+        agent_step1 = Step1Agent(spreadsheet_id)
+        agent_step1.run()
+    except Exception as e:
+        logger.error(f"💥 Fatal error during bg001 agent execution: {e}")
+
+@app.post("/webhook/run-bg001")
+async def webhook_run_bg001(background_tasks: BackgroundTasks):
+    """
+    Trigger the BG001 Step 1 Agent to run in the background.
+    Useful for external cron services (like cron-job.org or Google Apps Script).
+    """
+    background_tasks.add_task(run_bg001_agent_task)
+    return {"status": "success", "message": "BG001 Step 1 Agent started in the background."}
+
 # ── Run with Uvicorn ─────────────────────────────────────
 if __name__ == "__main__":
     import uvicorn
