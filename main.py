@@ -14,6 +14,9 @@ import os
 import logging
 from contextlib import asynccontextmanager
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
@@ -157,6 +160,65 @@ async def webhook_run_bg001(background_tasks: BackgroundTasks):
     """
     background_tasks.add_task(run_bg001_agent_task)
     return {"status": "success", "message": "BG001 Step 1 Agent started in the background."}
+
+
+# ── BG001 Step 3 Endpoint ──────────────────────────────────
+from agent.bg001_step_3.code.step_3_agent import Step3Agent
+
+def run_bg001_step3_task():
+    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM")
+    try:
+        agent_step3 = Step3Agent(spreadsheet_id)
+        agent_step3.run()
+    except Exception as e:
+        import traceback
+        logger.error(f"💥 Fatal error during bg001 step 3 agent execution: {e}\n{traceback.format_exc()}")
+
+@app.post("/webhook/run-bg001-step3")
+async def webhook_run_bg001_step3(background_tasks: BackgroundTasks):
+    """
+    Trigger the BG001 Step 3 Agent to run in the background.
+    Publishes approved blog posts to WordPress.
+    """
+    background_tasks.add_task(run_bg001_step3_task)
+    return {"status": "success", "message": "BG001 Step 3 Agent started in the background."}
+
+
+# ── Autoresponder Support Endpoint ─────────────────────────────────────────────
+from agent.autoresponder.code.autoresponder_agent import AutoresponderAgent
+
+
+def run_autoresponder_task():
+    """Background task: run one full autoresponder cycle."""
+    try:
+        agent_ar = AutoresponderAgent()
+        summary = agent_ar.run()
+        logger.info(f"📨 Autoresponder cycle complete: {summary}")
+    except Exception as e:
+        import traceback
+        logger.error(f"💥 Fatal error during autoresponder execution: {e}\n{traceback.format_exc()}")
+
+
+@app.post("/webhook/run-autoresponder")
+async def webhook_run_autoresponder(background_tasks: BackgroundTasks):
+    """
+    Trigger the Autoresponder Support Agent in the background.
+    Polls Gmail for unread emails, classifies them via OpenRouter,
+    searches Supabase KB ('documents 2' table), and sends professional HTML replies.
+    Call this endpoint every minute via an external cron (e.g., cron-job.org).
+    """
+    background_tasks.add_task(run_autoresponder_task)
+    return {"status": "success", "message": "Autoresponder Agent started in the background."}
+
+
+@app.get("/webhook/run-autoresponder")
+async def webhook_run_autoresponder_diagnostic():
+    """Helpful message for accidental GET requests to the autoresponder webhook."""
+    return {
+        "error": "Method Not Allowed",
+        "message": "This endpoint requires a POST request. The Autoresponder Agent is working correctly.",
+    }
+
 
 # ── Run with Uvicorn ─────────────────────────────────────
 if __name__ == "__main__":
