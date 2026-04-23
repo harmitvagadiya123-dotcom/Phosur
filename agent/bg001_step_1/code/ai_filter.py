@@ -24,18 +24,21 @@ def check_packaging_relevance(content: Dict) -> Optional[str]:
     Uses OpenAI to check if an RSS entry is relevant to a packaging company.
     Returns the link if relevant, else None.
     """
-    api_key = os.environ.get("OPENAI_API_KEY")
+    api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
-        logger.error("❌ OPENAI_API_KEY not found in environment.")
+        logger.error("❌ OPENROUTER_API_KEY not found in environment.")
         return None
 
-    client = OpenAI(api_key=api_key)
+    client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=api_key
+    )
     
     prompt = f"Input: {json.dumps(content)}\n\nTask: Filter for packaging company relevance."
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="openai/gpt-4o-mini",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt}

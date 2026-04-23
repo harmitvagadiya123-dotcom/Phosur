@@ -23,7 +23,7 @@ services:
         sync: false
       - key: GOOGLE_CREDENTIALS_BASE64
         sync: false
-      - key: OPENAI_API_KEY
+      - key: OPENROUTER_API_KEY
         sync: false
       - key: BG001_SHEET_ID
         sync: false
@@ -39,7 +39,7 @@ services:
     envVars:
       - key: GOOGLE_CREDENTIALS_BASE64
         sync: false
-      - key: OPENAI_API_KEY
+      - key: OPENROUTER_API_KEY
         sync: false
       - key: BG001_SHEET_ID
         sync: false

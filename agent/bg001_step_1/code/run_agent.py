@@ -28,8 +28,8 @@ def main():
         logger.error("❌ GOOGLE_CREDENTIALS_BASE64 is not set in .env")
         return
 
-    if not os.environ.get("OPENAI_API_KEY"):
-        logger.warning("⚠️ OPENAI_API_KEY is not set. AI filtering will fail.")
+    if not os.environ.get("OPENROUTER_API_KEY"):
+        logger.warning("⚠️ OPENROUTER_API_KEY is not set. AI filtering will fail.")
 
     try:
         agent = Step1Agent(spreadsheet_id)
