@@ -106,20 +106,20 @@ class PackagingChatbotAgent:
             # Count messages to determine if returning user
             message_count = len(conversation_history.split(",")) if conversation_history else 0
 
-            # ── Step 3a: Check for company details ────────────
-            if has_company_details(message):
-                logger.info("📋 Company details detected — extracting and saving")
-                return self._handle_company_details(session_id, message, conversation_history)
-
-            # ── Step 3b: Check buying intent ──────────────────
+            # ── Step 3a: Check buying intent (always check) ───
             intent_result = detect_buying_intent(message)
             if intent_result["has_buying_intent"]:
                 logger.info(f"🎯 Buying intent detected: {intent_result['intent_level']}")
                 update_buying_intent_sheet(
                     session_id,
                     intent_result["intent_level"],
-                    conversation_history,
+                    f"{conversation_history},{message}" if conversation_history else message,
                 )
+
+            # ── Step 3b: Check for company details ────────────
+            if has_company_details(message):
+                logger.info("📋 Company details detected — extracting and saving")
+                return self._handle_company_details(session_id, message, conversation_history)
 
             # ── Step 3c: KB search ────────────────────────────
             return self._handle_question(

@@ -101,8 +101,9 @@ def update_buying_intent_sheet(
     conversation_history: str,
 ) -> bool:
     """
-    Update the buying intent columns in the ChatbotCustomerInformation_Pacaging sheet.
-    Columns: buying Intent (col 6), buying intent message (col 7)
+    Update or create buying intent data in the ChatbotCustomerInformation_Pacaging sheet.
+    If the session row doesn't exist yet, creates it with just the intent data.
+    Columns: id(1) | name(2) | website(3) | email_address(4) | contact_number(5) | buying Intent(6) | buying intent message(7)
     """
     try:
         client = _get_client()
@@ -116,16 +117,21 @@ def update_buying_intent_sheet(
                 row_index = idx + 2
                 break
 
-        if row_index is None:
-            logger.warning(f"⚠️ Session {session_id} not found in customer sheet for intent update")
-            return False
+        if row_index is not None:
+            # Update existing row — only update buying intent columns
+            worksheet.update_cell(row_index, 6, intent_level)
+            worksheet.update_cell(row_index, 7, conversation_history)
+            logger.info(f"✅ Buying intent updated for {session_id}: {intent_level}")
+        else:
+            # Create new row with session_id and buying intent data
+            # Columns: id, name, website, email_address, contact_number, buying Intent, buying intent message
+            row = [session_id, "", "", "", "", intent_level, conversation_history]
+            worksheet.append_row(row, value_input_option="USER_ENTERED")
+            logger.info(f"✅ Created customer row with buying intent for {session_id}: {intent_level}")
 
-        worksheet.update_cell(row_index, 6, intent_level)
-        worksheet.update_cell(row_index, 7, conversation_history)
-
-        logger.info(f"✅ Buying intent updated for {session_id}: {intent_level}")
         return True
 
     except Exception as e:
         logger.error(f"❌ Failed to update buying intent: {e}", exc_info=True)
         return False
+
