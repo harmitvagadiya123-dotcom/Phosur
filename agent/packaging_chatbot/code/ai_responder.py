@@ -16,17 +16,17 @@ import base64
 import logging
 from typing import Optional, Dict
 
+import httpx
 from openai import OpenAI
 from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
+from google.auth.transport.requests import Request as AuthRequest
 
 logger = logging.getLogger(__name__)
 
 KNOWLEDGE_DOC_ID = "1OS2in1xIy3kOYhl-5XiYILe8dlJmFzL3Efh6U9IaDzE"
 
-# Google API scopes
+# Google API scopes — Drive scope is enough to export docs as text
 _SCOPES = [
-    "https://www.googleapis.com/auth/documents.readonly",
     "https://www.googleapis.com/auth/drive.readonly",
 ]
 
@@ -41,10 +41,21 @@ def _get_openrouter_client() -> OpenAI:
     return OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
 
 
+def _get_google_credentials() -> Credentials:
+    """Get Google service account credentials from env."""
+    creds_b64 = os.environ.get("GOOGLE_CREDENTIALS_BASE64", "")
+    if not creds_b64:
+        raise ValueError("GOOGLE_CREDENTIALS_BASE64 env var is not set")
+    creds_json = json.loads(base64.b64decode(creds_b64).decode("utf-8"))
+    credentials = Credentials.from_service_account_info(creds_json, scopes=_SCOPES)
+    credentials.refresh(AuthRequest())
+    return credentials
+
+
 def fetch_knowledge_doc() -> str:
     """
-    Fetch the knowledge document content from Google Docs.
-    Replicates the "Get Knowledge Docs1" node.
+    Fetch the knowledge document content from Google Docs using Drive export API.
+    Uses the Drive API to export the doc as plain text — no need for the Docs API.
     Caches the result for the process lifetime.
     """
     global _knowledge_doc_cache
@@ -54,34 +65,43 @@ def fetch_knowledge_doc() -> str:
     doc_id = os.environ.get("PACKAGING_KNOWLEDGE_DOC_ID", KNOWLEDGE_DOC_ID)
 
     try:
-        creds_b64 = os.environ.get("GOOGLE_CREDENTIALS_BASE64", "")
-        if not creds_b64:
-            raise ValueError("GOOGLE_CREDENTIALS_BASE64 env var is not set")
+        # Method 1: Use Google Drive export API (works with Drive scope)
+        credentials = _get_google_credentials()
+        export_url = f"https://www.googleapis.com/drive/v3/files/{doc_id}/export?mimeType=text/plain"
 
-        creds_json = json.loads(base64.b64decode(creds_b64).decode("utf-8"))
-        credentials = Credentials.from_service_account_info(creds_json, scopes=_SCOPES)
-        service = build("docs", "v1", credentials=credentials)
+        response = httpx.get(
+            export_url,
+            headers={"Authorization": f"Bearer {credentials.token}"},
+            timeout=30.0,
+        )
+        response.raise_for_status()
+        full_content = response.text
 
-        doc = service.documents().get(documentId=doc_id).execute()
-
-        # Extract text content from the document
-        content_parts = []
-        for element in doc.get("body", {}).get("content", []):
-            if "paragraph" in element:
-                for elem in element["paragraph"].get("elements", []):
-                    text_run = elem.get("textRun", {})
-                    content = text_run.get("content", "")
-                    if content.strip():
-                        content_parts.append(content)
-
-        full_content = "".join(content_parts)
-        _knowledge_doc_cache = full_content
-        logger.info(f"✅ Knowledge doc fetched ({len(full_content)} chars)")
-        return full_content
+        if full_content and len(full_content) > 50:
+            _knowledge_doc_cache = full_content
+            logger.info(f"✅ Knowledge doc fetched via Drive export ({len(full_content)} chars)")
+            return full_content
 
     except Exception as e:
-        logger.error(f"❌ Failed to fetch knowledge doc: {e}", exc_info=True)
-        return ""
+        logger.warning(f"⚠️ Drive export failed: {e}")
+
+    # Method 2: Try fetching as published doc (public URL fallback)
+    try:
+        published_url = f"https://docs.google.com/document/d/{doc_id}/export?format=txt"
+        response = httpx.get(published_url, timeout=30.0, follow_redirects=True)
+        response.raise_for_status()
+        full_content = response.text
+
+        if full_content and len(full_content) > 50:
+            _knowledge_doc_cache = full_content
+            logger.info(f"✅ Knowledge doc fetched via public export ({len(full_content)} chars)")
+            return full_content
+
+    except Exception as e:
+        logger.warning(f"⚠️ Public export also failed: {e}")
+
+    logger.error("❌ Could not fetch knowledge doc via any method")
+    return ""
 
 
 def get_ai_response(
