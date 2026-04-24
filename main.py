@@ -19,6 +19,7 @@ load_dotenv()
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from agent.buying_intent.code.buying_intent_agent import BuyingIntentAgent
 
@@ -50,6 +51,15 @@ app = FastAPI(
     description="Replaces n8n webhook → email → sheet update pipeline",
     version="1.0.0",
     lifespan=lifespan,
+)
+
+# ── CORS Middleware (allows browser-based chatbot calls) ──
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],          # Allow all origins (your website)
+    allow_credentials=True,
+    allow_methods=["*"],          # Allow all HTTP methods including OPTIONS
+    allow_headers=["*"],          # Allow all headers
 )
 
 # Singleton agent instance
