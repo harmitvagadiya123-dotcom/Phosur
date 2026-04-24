@@ -32,6 +32,8 @@ services:
         sync: false
       - key: AUTORESPONDER_PASSWORD
         sync: false
+      - key: ONRENDER_EMAIL_ID
+        value: "harmitvagadiya123@gmail.com"
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_KEY
