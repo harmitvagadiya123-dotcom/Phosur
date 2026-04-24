@@ -220,6 +220,73 @@ async def webhook_run_autoresponder_diagnostic():
     }
 
 
+# ── Packaging Chatbot Endpoint ─────────────────────────────────────────────
+from agent.packaging_chatbot.code.chatbot_agent import PackagingChatbotAgent
+
+# Singleton chatbot agent instance
+packaging_chatbot = PackagingChatbotAgent()
+
+
+@app.post("/webhook/chatbot-packaging")
+async def webhook_chatbot_packaging(request: Request):
+    """
+    Packaging Chatbot webhook — synchronous request/response.
+    Receives a message from the website frontend and returns an AI response.
+
+    Expected JSON payload:
+    {
+        "session_id": "unique-session-id",
+        "message": "user's question",
+        "user_id": "optional-user-id"
+    }
+
+    Returns:
+    {
+        "answer": "bot response",
+        "session_id": "session-id",
+        "status": "new_session | details_received | kb_match | ai_response | error"
+    }
+    """
+    try:
+        payload = await request.json()
+    except Exception as e:
+        logger.error(f"❌ Invalid JSON in chatbot request: {e}")
+        return JSONResponse(
+            status_code=400,
+            content={"answer": "Invalid request format.", "session_id": "", "status": "error"},
+        )
+
+    session_id = payload.get("session_id") or payload.get("body", {}).get("session_id")
+    message = payload.get("message") or payload.get("body", {}).get("message", "")
+    user_id = payload.get("user_id") or payload.get("body", {}).get("user_id", "anonymous")
+
+    if not session_id:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "answer": "session_id is required. Your frontend must generate and send a unique session_id with every message.",
+                "session_id": "",
+                "status": "error",
+            },
+        )
+
+    logger.info(f"📨 Chatbot request: session={session_id}, msg='{message[:60]}'")
+
+    result = packaging_chatbot.process(session_id, message, user_id)
+
+    return JSONResponse(status_code=200, content=result)
+
+
+@app.get("/webhook/chatbot-packaging")
+async def webhook_chatbot_packaging_diagnostic():
+    """Helpful message for accidental GET requests to the chatbot webhook."""
+    return {
+        "error": "Method Not Allowed",
+        "message": "This endpoint requires a POST request with {session_id, message}. "
+                   "The Packaging Chatbot is working correctly.",
+    }
+
+
 # ── Run with Uvicorn ─────────────────────────────────────
 if __name__ == "__main__":
     import uvicorn

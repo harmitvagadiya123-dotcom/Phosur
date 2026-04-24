@@ -45,4 +45,9 @@ services:
         sync: false
       - key: WP_AUTHOR
         sync: false
+      # ── Packaging Chatbot ──
+      - key: PACKAGING_SHEET_ID
+        value: "1erIY6nUrWBzPimCmnvZk6IAFg-mBOwykB9nW8juTDto"
+      - key: PACKAGING_KNOWLEDGE_DOC_ID
+        value: "14NkKSq8IvsMtgEy0gsJ6nvwelkPuOKupB2Oeq7kwIks"
 
