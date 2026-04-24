@@ -120,16 +120,22 @@ def fetch_unread_emails() -> List[Dict]:
         mail.login(email_addr, password)
         mail.select("INBOX")
 
-        # Search for unread emails (matches n8n filter: is:unread newer_than:1d)
-        status, message_ids = mail.search(None, "UNSEEN")
+        # Use today's date to only fetch emails from today (SINCE) that are UNSEEN
+        from datetime import datetime
+        today_str = datetime.now().strftime("%d-%b-%Y")
+        status, message_ids = mail.search(None, "UNSEEN", "SINCE", today_str)
         if status != "OK":
             logger.warning("⚠️ IMAP search returned non-OK status")
             return []
 
         ids = message_ids[0].split()
+        if not ids:
+            logger.info("📭 No new unread emails from today. Skipping.")
+            return []
+
         # Take only the BATCH_LIMIT most recent unread emails
         ids = ids[-BATCH_LIMIT:]
-        logger.info(f"📬 Found {len(message_ids[0].split())} unread, processing latest {len(ids)}")
+        logger.info(f"📬 Found {len(message_ids[0].split())} unread from today, processing latest {len(ids)}")
 
         for msg_id in ids:
             status, msg_data = mail.fetch(msg_id, "(RFC822)")
