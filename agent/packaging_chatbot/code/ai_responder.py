@@ -22,7 +22,7 @@ from googleapiclient.discovery import build
 
 logger = logging.getLogger(__name__)
 
-KNOWLEDGE_DOC_ID = "14NkKSq8IvsMtgEy0gsJ6nvwelkPuOKupB2Oeq7kwIks"
+KNOWLEDGE_DOC_ID = "1OS2in1xIy3kOYhl-5XiYILe8dlJmFzL3Efh6U9IaDzE"
 
 # Google API scopes
 _SCOPES = [

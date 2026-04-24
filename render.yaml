@@ -49,5 +49,5 @@ services:
       - key: PACKAGING_SHEET_ID
         value: "1erIY6nUrWBzPimCmnvZk6IAFg-mBOwykB9nW8juTDto"
       - key: PACKAGING_KNOWLEDGE_DOC_ID
-        value: "14NkKSq8IvsMtgEy0gsJ6nvwelkPuOKupB2Oeq7kwIks"
+        value: "1OS2in1xIy3kOYhl-5XiYILe8dlJmFzL3Efh6U9IaDzE"
 
