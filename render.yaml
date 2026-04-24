@@ -29,9 +29,9 @@ services:
         value: "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM"
       # ── Autoresponder Support Agent ──
       - key: AUTORESPONDER_EMAIL
-        sync: false
+        value: "harmitvagadiya123@gmail.com"
       - key: AUTORESPONDER_PASSWORD
-        sync: false
+        value: "juujsdndpfbhzkzk"
       - key: ONRENDER_EMAIL_ID
         value: "harmitvagadiya123@gmail.com"
       - key: SUPABASE_URL
