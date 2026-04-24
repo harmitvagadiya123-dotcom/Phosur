@@ -35,9 +35,9 @@ services:
       - key: ONRENDER_EMAIL_ID
         value: "harmitvagadiya123@gmail.com"
       - key: SUPABASE_URL
-        sync: false
+        value: "https://umbxdmxpjbgabrhquafe.supabase.co"
       - key: SUPABASE_SERVICE_KEY
-        sync: false
+        value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtYnhkbXhwamJnYWJyaHF1YWZlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTU4NDU2OSwiZXhwIjoyMDcxMTYwNTY5fQ.g-nfeZAH5EX5JaMpBtLI6AEMFTqKQuOkRzFRYZ71Jxk"
       # ── WordPress (BG001 Step 3) ──
       - key: WP_PUBLISH_URL
         sync: false
