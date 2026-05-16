@@ -32,6 +32,12 @@ logging.basicConfig(
 logger = logging.getLogger("buying-intent-server")
 
 
+from apscheduler.schedulers.background import BackgroundScheduler
+import pytz
+
+ist_tz = pytz.timezone("Asia/Kolkata")
+scheduler = BackgroundScheduler(timezone=ist_tz)
+
 # ── App Lifecycle ────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,8 +46,11 @@ async def lifespan(app: FastAPI):
     logger.info(f"   NOTIFY_TO : {os.environ.get('NOTIFY_TO', 'not set')}")
     logger.info(f"   NOTIFY_CC : {os.environ.get('NOTIFY_CC', 'not set')}")
     logger.info(f"   SHEET_ID  : {os.environ.get('GOOGLE_SHEET_ID', 'default')}")
+    scheduler.start()
+    logger.info("⏰ APScheduler started for background jobs (IST)")
     logger.info("=" * 60)
     yield
+    scheduler.shutdown()
     logger.info("🛑 Buying Intent LinkedIn Agent — STOPPED")
 
 
@@ -183,6 +192,16 @@ def run_bg001_step3_task():
     except Exception as e:
         import traceback
         logger.error(f"💥 Fatal error during bg001 step 3 agent execution: {e}\n{traceback.format_exc()}")
+
+# Schedule the Authority Building Scenario to run every 3 PM, 4 PM, 5 PM, and 9 PM (IST)
+scheduler.add_job(
+    run_bg001_step3_task,
+    'cron',
+    hour='15,16,17,21',
+    minute='0',
+    id='authority_building_scenario',
+    replace_existing=True
+)
 
 @app.post("/webhook/run-bg001-step3")
 async def webhook_run_bg001_step3(background_tasks: BackgroundTasks):

@@ -17,8 +17,9 @@ logging.basicConfig(
 logger = logging.getLogger("step-3-launcher")
 
 def main():
-    # Load .env file
-    load_dotenv()
+    # Load .env file explicitly from the project root
+    env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.env"))
+    load_dotenv(env_path)
 
     # Sheet ID from env (same spreadsheet as Step 1)
     spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM")
