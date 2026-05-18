@@ -14,11 +14,15 @@ import os
 import logging
 from contextlib import asynccontextmanager
 
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 load_dotenv()
 
+# pyrefly: ignore [missing-import]
 from fastapi import FastAPI, Request
+# pyrefly: ignore [missing-import]
 from fastapi.responses import JSONResponse
+# pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
 
 from agent.buying_intent.code.buying_intent_agent import BuyingIntentAgent
@@ -32,6 +36,7 @@ logging.basicConfig(
 logger = logging.getLogger("buying-intent-server")
 
 
+# pyrefly: ignore [missing-import]
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 
@@ -160,6 +165,7 @@ async def webhook_buying_intent(request: Request):
 
 # ── BG001 Step 1 Endpoint ──────────────────────────────────
 from agent.bg001_step_1.code.step_1_agent import Step1Agent
+# pyrefly: ignore [missing-import]
 from fastapi import BackgroundTasks
 
 def run_bg001_agent_task():
@@ -318,6 +324,7 @@ async def webhook_chatbot_packaging_diagnostic():
 
 # ── Run with Uvicorn ─────────────────────────────────────
 if __name__ == "__main__":
+    # pyrefly: ignore [missing-import]
     import uvicorn
 
     port = int(os.environ.get("PORT", 8000))

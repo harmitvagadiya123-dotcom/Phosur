@@ -1,5 +1,6 @@
 import os
 import logging
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 
 # Add the app directory to sys.path if running from within the package
