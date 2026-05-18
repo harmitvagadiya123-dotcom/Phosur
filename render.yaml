@@ -26,7 +26,7 @@ services:
       - key: OPENROUTER_API_KEY
         sync: false
       - key: BG001_SHEET_ID
-        value: "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM"
+        value: "1erIY6nUrWBzPimCmnvZk6IAFg-mBOwykB9nW8juTDto"
       # ── Autoresponder Support Agent ──
       - key: AUTORESPONDER_EMAIL
         value: "harmitvagadiya123@gmail.com"

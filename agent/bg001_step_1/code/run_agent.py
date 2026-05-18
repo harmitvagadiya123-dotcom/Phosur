@@ -22,7 +22,7 @@ def main():
 
     # Sheet ID from the workflow (BG001-Phosur-Scenario)
     # You can also set this in .env as BG001_SHEET_ID
-    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM")
+    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1erIY6nUrWBzPimCmnvZk6IAFg-mBOwykB9nW8juTDto")
 
     if not os.environ.get("GOOGLE_CREDENTIALS_BASE64"):
         logger.error("❌ GOOGLE_CREDENTIALS_BASE64 is not set in .env")

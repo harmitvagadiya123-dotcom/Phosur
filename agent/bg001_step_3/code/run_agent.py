@@ -23,7 +23,7 @@ def main():
     load_dotenv(env_path)
 
     # Sheet ID from env (same spreadsheet as Step 1)
-    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM")
+    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1erIY6nUrWBzPimCmnvZk6IAFg-mBOwykB9nW8juTDto")
 
     if not os.environ.get("GOOGLE_CREDENTIALS_BASE64"):
         logger.error("❌ GOOGLE_CREDENTIALS_BASE64 is not set in .env")

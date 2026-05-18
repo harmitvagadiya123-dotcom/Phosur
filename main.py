@@ -169,7 +169,7 @@ from agent.bg001_step_1.code.step_1_agent import Step1Agent
 from fastapi import BackgroundTasks
 
 def run_bg001_agent_task():
-    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM")
+    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1erIY6nUrWBzPimCmnvZk6IAFg-mBOwykB9nW8juTDto")
     try:
         agent_step1 = Step1Agent(spreadsheet_id)
         agent_step1.run()
@@ -191,7 +191,7 @@ async def webhook_run_bg001(background_tasks: BackgroundTasks):
 from agent.bg001_step_3.code.step_3_agent import Step3Agent
 
 def run_bg001_step3_task():
-    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM")
+    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1erIY6nUrWBzPimCmnvZk6IAFg-mBOwykB9nW8juTDto")
     try:
         agent_step3 = Step3Agent(spreadsheet_id)
         agent_step3.run()
@@ -206,6 +206,16 @@ scheduler.add_job(
     hour='15,16,17,21',
     minute='0',
     id='authority_building_scenario',
+    replace_existing=True
+)
+
+# Extra schedule for 5:50 PM (IST)
+scheduler.add_job(
+    run_bg001_step3_task,
+    'cron',
+    hour='17',
+    minute='50',
+    id='authority_building_scenario_550',
     replace_existing=True
 )
 

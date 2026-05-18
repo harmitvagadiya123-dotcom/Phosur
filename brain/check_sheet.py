@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 def main():
     load_dotenv()
     creds_b64 = os.environ.get("GOOGLE_CREDENTIALS_BASE64", "")
-    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1bnz46ES2olQP7vPqvIpthBhF08TQ5RCN28ytcjjszsM")
+    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1erIY6nUrWBzPimCmnvZk6IAFg-mBOwykB9nW8juTDto")
     
     creds_json = json.loads(base64.b64decode(creds_b64).decode("utf-8"))
     credentials = Credentials.from_service_account_info(creds_json, scopes=[
