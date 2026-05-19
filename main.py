@@ -25,7 +25,7 @@ from fastapi.responses import JSONResponse
 # pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
 
-from agent.buying_intent.code.buying_intent_agent import BuyingIntentAgent
+# from agent.buying_intent.code.buying_intent_agent import BuyingIntentAgent
 
 # ── Logging ──────────────────────────────────────────────
 logging.basicConfig(
@@ -77,7 +77,7 @@ app.add_middleware(
 )
 
 # Singleton agent instance
-agent = BuyingIntentAgent()
+# agent = BuyingIntentAgent()
 
 
 # ── Root Endpoint ──────────────────────────────────────────
@@ -139,40 +139,30 @@ async def webhook_buying_intent(request: Request):
 
     logger.info(f"📨 Webhook received: {payload.get('NAME', 'Unknown')} (Row {payload.get('row_number', '?')})")
 
-    # Process through the agent
-    result = agent.process(payload)
-
-    # Log specific failure reasons if 207 (partial success)
-    if not result.success:
-        logger.warning(f"⚠️ Partial Success (207) for '{payload.get('NAME')}':")
-        logger.warning(f"   Message : {result.message}")
-        if result.error:
-            logger.warning(f"   Error   : {result.error}")
-
-    status_code = 200 if result.success else 207  # 207 = partial success
-
+    # PAUSED
     return JSONResponse(
-        status_code=status_code,
+        status_code=200,
         content={
-            "success": result.success,
-            "email_sent": result.email_sent,
-            "sheet_updated": result.sheet_updated,
-            "message": result.message,
-            "error": result.error,
+            "success": False,
+            "email_sent": False,
+            "sheet_updated": False,
+            "message": "Buying Intent Agent is currently paused.",
+            "error": None,
         },
     )
 
 
 # ── BG001 Step 1 Endpoint ──────────────────────────────────
-from agent.bg001_step_1.code.step_1_agent import Step1Agent
+# from agent.bg001_step_1.code.step_1_agent import Step1Agent
 # pyrefly: ignore [missing-import]
 from fastapi import BackgroundTasks
 
 def run_bg001_agent_task():
-    spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1erIY6nUrWBzPimCmnvZk6IAFg-mBOwykB9nW8juTDto")
+    # spreadsheet_id = os.environ.get("BG001_SHEET_ID", "1erIY6nUrWBzPimCmnvZk6IAFg-mBOwykB9nW8juTDto")
     try:
-        agent_step1 = Step1Agent(spreadsheet_id)
-        agent_step1.run()
+        # agent_step1 = Step1Agent(spreadsheet_id)
+        # agent_step1.run()
+        logger.info("BG001 Step 1 Agent is currently paused.")
     except Exception as e:
         import traceback
         logger.error(f"💥 Fatal error during bg001 agent execution: {e}\n{traceback.format_exc()}")
@@ -230,15 +220,16 @@ async def webhook_run_bg001_step3(background_tasks: BackgroundTasks):
 
 
 # ── Autoresponder Support Endpoint ─────────────────────────────────────────────
-from agent.autoresponder.code.autoresponder_agent import AutoresponderAgent
+# from agent.autoresponder.code.autoresponder_agent import AutoresponderAgent
 
 
 def run_autoresponder_task():
     """Background task: run one full autoresponder cycle."""
     try:
-        agent_ar = AutoresponderAgent()
-        summary = agent_ar.run()
-        logger.info(f"📨 Autoresponder cycle complete: {summary}")
+        # agent_ar = AutoresponderAgent()
+        # summary = agent_ar.run()
+        # logger.info(f"📨 Autoresponder cycle complete: {summary}")
+        logger.info("Autoresponder Agent is currently paused.")
     except Exception as e:
         import traceback
         logger.error(f"💥 Fatal error during autoresponder execution: {e}\n{traceback.format_exc()}")
@@ -266,10 +257,10 @@ async def webhook_run_autoresponder_diagnostic():
 
 
 # ── Packaging Chatbot Endpoint ─────────────────────────────────────────────
-from agent.packaging_chatbot.code.chatbot_agent import PackagingChatbotAgent
+# from agent.packaging_chatbot.code.chatbot_agent import PackagingChatbotAgent
 
 # Singleton chatbot agent instance
-packaging_chatbot = PackagingChatbotAgent()
+# packaging_chatbot = PackagingChatbotAgent()
 
 
 @app.post("/webhook/chatbot-packaging")
@@ -317,7 +308,12 @@ async def webhook_chatbot_packaging(request: Request):
 
     logger.info(f"📨 Chatbot request: session={session_id}, msg='{message[:60]}'")
 
-    result = packaging_chatbot.process(session_id, message, user_id)
+    # PAUSED
+    result = {
+        "answer": "The chatbot is currently down for maintenance.",
+        "session_id": session_id,
+        "status": "error"
+    }
 
     return JSONResponse(status_code=200, content=result)
 
