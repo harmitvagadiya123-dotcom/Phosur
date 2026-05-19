@@ -209,13 +209,13 @@ scheduler.add_job(
     replace_existing=True
 )
 
-# Extra schedule for 5:50 PM (IST)
+# Extra schedules for 4:50 PM and 5:50 PM (IST)
 scheduler.add_job(
     run_bg001_step3_task,
     'cron',
-    hour='17',
+    hour='16,17',
     minute='50',
-    id='authority_building_scenario_550',
+    id='authority_building_scenario_50_mins',
     replace_existing=True
 )
 
