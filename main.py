@@ -189,21 +189,21 @@ def run_bg001_step3_task():
         import traceback
         logger.error(f"💥 Fatal error during bg001 step 3 agent execution: {e}\n{traceback.format_exc()}")
 
-# Schedule the Authority Building Scenario to run at the top of the hour: 12 PM, 1 PM, 3 PM, 4 PM, 5 PM, and 9 PM (IST)
+# Schedule the Authority Building Scenario to run at the top of the hour: 12 PM, 1 PM, 3 PM, 4 PM, 5 PM, 6 PM, 7 PM, and 9 PM (IST)
 scheduler.add_job(
     run_bg001_step3_task,
     'cron',
-    hour='12,13,15,16,17,21',
+    hour='12,13,15,16,17,18,19,21',
     minute='0',
     id='authority_building_scenario',
     replace_existing=True
 )
 
-# Schedule for 1:30 PM and 2:30 PM (IST)
+# Schedule for 1:30 PM, 2:30 PM, and 6:30 PM (IST)
 scheduler.add_job(
     run_bg001_step3_task,
     'cron',
-    hour='13,14',
+    hour='13,14,18',
     minute='30',
     id='authority_building_scenario_half_hours',
     replace_existing=True
